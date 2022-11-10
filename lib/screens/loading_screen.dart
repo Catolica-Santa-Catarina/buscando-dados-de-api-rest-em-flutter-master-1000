@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import '../services/location.dart';
 import '../services/networking.dart';
 import 'location_screen.dart';
+import '../services/weather.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const apiKey = '520d22fc8fe657078523a94c02959426';
@@ -15,13 +16,10 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-    late double latitude;
-    late double longitude;
-
     @override
     void initState() {
        super.initState();
-       getLocation();
+       getData();
     }
 
     void pushToLocationScreen(dynamic weatherData) {
@@ -31,26 +29,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
 
     void getData() async {
-      NetworkHelper networkHelper = NetworkHelper('https://api.openweathermap.org/'
-          'data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric');
-
-      var weatherData = await networkHelper.getData();
-      this.pushToLocationScreen();
-    }
-
-    Future<void> getLocation() async {
-      var location = Location();
-      location.getCurrentLocation();
-
-      latitude = location.latitude;
-      longitude = location.longitude;
-
-      getData();
+      var weatherData = await WeatherModel().getLocationWeather();
+      pushToLocationScreen(weatherData);
     }
 
     @override
     Widget build(BuildContext context) {
-      getData();
       return const Center(
         child: SpinKitDoubleBounce(
           color: Colors.white,
